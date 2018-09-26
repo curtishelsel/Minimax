@@ -1,4 +1,10 @@
-//import statements
+import pacsim.BFSPath;
+import pacsim.PacAction;
+import pacsim.PacCell;
+import pacsim.PacFace;
+import pacsim.PacSim;
+import pacsim.PacUtils;
+import pacsim.PacmanCell;
 
 public class PacSimMinimax implements PacAction{
 
