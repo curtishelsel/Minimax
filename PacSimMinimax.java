@@ -5,16 +5,22 @@ import pacsim.PacFace;
 import pacsim.PacSim;
 import pacsim.PacUtils;
 import pacsim.PacmanCell;
+import java.util.ArrayList;
+import java.util.List;
+import java.awt.Point;
 
 public class PacSimMinimax implements PacAction{
 
 	//option: class and instance variables
+	private int depth;
+	private	List<Point> path;
 
 	public PacSimMinimax(int depth, String fname, int te, int gran, int max){
-		//option: initialize some variables
 
+		this.depth = depth;
 		PacSim sim =  new PacSim(fname, te, gran, max);
 		sim.init(this);
+		path = new ArrayList();
 	}
 	
 	public static void main(String[] args){
@@ -52,10 +58,20 @@ public class PacSimMinimax implements PacAction{
 	@Override
 	public PacFace action(Object state){
 		PacCell[][] grid = (PacCell[][]) state;
+		PacmanCell pc = PacUtils.findPacman(grid);
 		PacFace newFace = null;
+		
+		if(pc == null) return null;
 
-		//some of my code
+		if(path.isEmpty()){
+			Point p = PacUtils.nearestFood(pc.getLoc(), grid);
+			path = BFSPath.getPath(grid, pc.getLoc(), p);
+		}	
+		
+		Point next = path.remove(0);
+		newFace = PacUtils.direction(pc.getLoc(), next);
 
+		
 		return newFace;
 	}
 }
