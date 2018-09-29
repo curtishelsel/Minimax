@@ -55,6 +55,37 @@ public class PacSimMinimax implements PacAction{
 	@Override
 	public void init(){}
 
+	public List<Point> minimax(PacmanCell pc, PacCell[][] grid){
+		
+		System.out.println(getMoves(pc.getLoc().x, pc.getLoc().y, grid));
+		Point p = PacUtils.nearestFood(pc.getLoc(), grid);
+		return BFSPath.getPath(grid, pc.getLoc(), p);
+	}
+
+	// Method gets the list of possible moves from current location
+	public List<Point> getMoves(int x, int y, PacCell[][] grid){
+		
+		List<Point> moves = new ArrayList();
+
+		// West
+		if(PacUtils.unoccupied(x-1 , y, grid))
+			moves.add(new Point(x-1, y));
+
+		// East
+		if(PacUtils.unoccupied(x+1, y, grid))
+			moves.add(new Point(x+1, y));
+
+		// South
+		if(PacUtils.unoccupied(x, y-1, grid))
+			moves.add(new Point(x, y-1));
+
+		// North
+		if(PacUtils.unoccupied(x, y+1, grid))
+			moves.add(new Point(x, y+1));
+
+		return moves;
+	}
+
 	@Override
 	public PacFace action(Object state){
 		PacCell[][] grid = (PacCell[][]) state;
@@ -64,8 +95,7 @@ public class PacSimMinimax implements PacAction{
 		if(pc == null) return null;
 
 		if(path.isEmpty()){
-			Point p = PacUtils.nearestFood(pc.getLoc(), grid);
-			path = BFSPath.getPath(grid, pc.getLoc(), p);
+			path = minimax(pc, grid); 
 		}	
 		
 		Point next = path.remove(0);
