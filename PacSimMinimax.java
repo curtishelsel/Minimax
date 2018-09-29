@@ -56,8 +56,22 @@ public class PacSimMinimax implements PacAction{
 	public void init(){}
 
 	public List<Point> minimax(PacmanCell pc, PacCell[][] grid){
+		List<Point> pacMoves = new ArrayList<Point>();
+		List<Point> ghosts = new ArrayList<Point>();
+		List<List<Point>> ghostMoves = new ArrayList<List<Point>>();
+
+		pacMoves = getMoves(pc.getLoc().x, pc.getLoc().y, grid);
+
+		ghosts = PacUtils.findGhosts(grid);
+
+		for(int i = 0; i < ghosts.size(); i++){
+			int x = ghosts.get(i).x;
+			int y = ghosts.get(i).y;
+			ghostMoves.add(getMoves(x,y, grid));
+		}
 		
-		System.out.println(getMoves(pc.getLoc().x, pc.getLoc().y, grid));
+		System.out.println(ghostMoves);
+		System.out.println();
 		Point p = PacUtils.nearestFood(pc.getLoc(), grid);
 		return BFSPath.getPath(grid, pc.getLoc(), p);
 	}
@@ -65,7 +79,7 @@ public class PacSimMinimax implements PacAction{
 	// Method gets the list of possible moves from current location
 	public List<Point> getMoves(int x, int y, PacCell[][] grid){
 		
-		List<Point> moves = new ArrayList();
+		List<Point> moves = new ArrayList<Point>();
 
 		// West
 		if(PacUtils.unoccupied(x-1 , y, grid))
