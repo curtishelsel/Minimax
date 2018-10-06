@@ -25,3 +25,5 @@ hs_err_pid*
 game-small-new
 *.DS_Store
 MANIFEST.MF
+*.pdf
+*PacSimMinimax.java.swp
