@@ -55,32 +55,49 @@ public class PacSimMinimax implements PacAction{
 	@Override
 	public void init(){}
 
-	public List<Point> minimax(PacmanCell pc, PacCell[][] grid){
+	public void getStates(int depth, PacCell[][] grid, State state, List<Point> ghosts){
+	
 		List<Point> pacMoves = new ArrayList<Point>();
-		List<Point> ghosts = new ArrayList<Point>();
-		List<List<Point>> ghostMoves = new ArrayList<List<Point>>();
-
+		List<List<Point>> ghostList = new ArrayList<List<Point>>();
 
 		// find valid pacman moves
-		pacMoves = getMoves(pc.getLoc().x, pc.getLoc().y, grid);
-		
-		// find number of ghosts and valid moves for each ghost
-		ghosts = PacUtils.findGhosts(grid);
+		pacMoves = getMoves(state.getMove(0).x, state.getMove(0).y, grid);
 
 		for(int i = 0; i < ghosts.size(); i++){
-			int x = ghosts.get(i).x;
-			int y = ghosts.get(i).y;
-			ghostMoves.add(getMoves(x,y, grid));
+			List<Point> ghostMoves = new ArrayList<Point>();
+			ghostMoves = getMoves(ghosts.get(i).x, ghosts.get(i).y, grid);
+			ghostList.add(ghostMoves);
 		}
-		
 
-		
+		for(int i = 0; i < ghostList.get(0).size(); i++){
+			for(int j = 0; j < ghostList.get(1).size(); j++){
+				for(int k = 0; k < pacMoves.size(); k++){
+					state.addState(new State(pacMoves.get(k)));
+					
+					int len = state.getChildren().size() - 1;
+					State child = new State();
+					child = state.getChildren().get(len);
 
-		Point p = PacUtils.nearestGoody(pc.getLoc(), grid);
-		return BFSPath.getPath(grid, pc.getLoc(), p);
+					child.addMove(ghostList.get(0).get(i));			
+					child.addMove(ghostList.get(1).get(j));
+					child.setValue(evaluate(child, grid));
+				}
+			} 
+		}
+
 	}
 
+	public int evaluate(State state, PacCell[][] grid){
+		
+		Point p = PacUtils.nearestFood(state.getMove(0), grid);
+		int value = BFSPath.getPath(grid, state.getMove(0), p).size();
+		
+		value -= BFSPath.getPath(grid, state.getMove(0), state.getMove(1)).size();
+		value -= BFSPath.getPath(grid, state.getMove(0), state.getMove(2)).size();
 
+		return value;
+	}
+	
 
 	// Method gets the list of possible moves from current location
 	public List<Point> getMoves(int x, int y, PacCell[][] grid){
@@ -115,7 +132,11 @@ public class PacSimMinimax implements PacAction{
 		if(pc == null) return null;
 
 		if(path.isEmpty()){
-			path = minimax(pc, grid); 
+			
+			State current = new State(pc.getLoc(), PacUtils.findGhosts(grid));
+
+			getStates(depth, grid, current, PacUtils.findGhosts(grid)); 
+			path = BFSPath.getPath(grid, pc.getLoc(), PacUtils.nearestFood(pc.getLoc(), grid));
 		}	
 		
 		Point next = path.remove(0);
