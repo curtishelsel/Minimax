@@ -14,6 +14,7 @@ public class PacSimMinimax implements PacAction{
 	//option: class and instance variables
 	private int depth;
 	private	List<Point> path;
+	private int actionNum;
 
 	public PacSimMinimax(int depth, String fname, int te, int gran, int max){
 
@@ -57,6 +58,13 @@ public class PacSimMinimax implements PacAction{
 
 	public void getStates(int depth, PacCell[][] grid, State state, List<Point> ghosts){
 	
+		
+		System.out.print("Depth " + depth + " Value: " + state.getValue() + " ");
+		if(depth == 0){
+			return;
+		}
+
+
 		List<Point> pacMoves = new ArrayList<Point>();
 		List<List<Point>> ghostList = new ArrayList<List<Point>>();
 
@@ -81,6 +89,7 @@ public class PacSimMinimax implements PacAction{
 					child.addMove(ghostList.get(0).get(i));			
 					child.addMove(ghostList.get(1).get(j));
 					child.setValue(evaluate(child, grid));
+					getStates(depth-1, grid, child, child.getMoves().subList(1,child.getMoves().size()));
 				}
 			} 
 		}
@@ -134,8 +143,10 @@ public class PacSimMinimax implements PacAction{
 		if(path.isEmpty()){
 			
 			State current = new State(pc.getLoc(), PacUtils.findGhosts(grid));
-
+			
+			System.out.println("Action Number" + ++actionNum);
 			getStates(depth, grid, current, PacUtils.findGhosts(grid)); 
+			System.out.println("\n");
 			path = BFSPath.getPath(grid, pc.getLoc(), PacUtils.nearestFood(pc.getLoc(), grid));
 		}	
 		
